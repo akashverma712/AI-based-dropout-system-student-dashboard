@@ -15,13 +15,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-function AttendanceCalendar({ attendanceData }) {
+function AttendanceCalendar({ attendanceData = [] }) {
   const days = Array.from({ length: 30 }, (_, i) => i + 1);
 
   return (
     <div className="grid grid-cols-7 gap-2 text-center text-sm">
       {days.map((day) => {
-        const status = attendanceData[day % attendanceData.length];
+        const status = attendanceData[day % (attendanceData.length || 1)];
         const isPresent = status?.present ?? Math.random() > 0.5;
         return (
           <div
@@ -68,7 +68,7 @@ export default function SubjectDetails({ subject }) {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             📅 Attendance Calendar
           </h3>
-          <AttendanceCalendar attendanceData={subject.attendanceData} />
+          <AttendanceCalendar attendanceData={subject.attendanceData || []} />
         </div>
 
         {/* Graph View */}
@@ -76,7 +76,7 @@ export default function SubjectDetails({ subject }) {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             📊 Attendance Graph
           </h3>
-          <AttendanceChart data={subject.attendanceData} />
+          <AttendanceChart data={subject.attendanceData || []} />
         </div>
       </div>
 
@@ -87,8 +87,8 @@ export default function SubjectDetails({ subject }) {
           <h3 className="text-lg font-semibold mb-4">📈 Mid Sem</h3>
           <div className="w-24 h-24">
             <CircularProgressbar
-              value={subject.midSem}
-              text={`${subject.midSem}%`}
+              value={subject.midSem || 0}
+              text={`${subject.midSem || 0}%`}
               styles={buildStyles({
                 textSize: "16px",
                 textColor: "#2563eb",
@@ -104,8 +104,8 @@ export default function SubjectDetails({ subject }) {
           <h3 className="text-lg font-semibold mb-4">🎯 End Sem</h3>
           <div className="w-24 h-24">
             <CircularProgressbar
-              value={subject.endSem}
-              text={`${subject.endSem}%`}
+              value={subject.endSem || 0}
+              text={`${subject.endSem || 0}%`}
               styles={buildStyles({
                 textSize: "16px",
                 textColor: "#16a34a",
@@ -135,7 +135,7 @@ export default function SubjectDetails({ subject }) {
       </div>
 
       {/* Past Semester Trend */}
-      {subject.pastSems && subject.pastSems.length > 0 && (
+      {subject.pastSems?.length > 0 && (
         <div className="bg-white rounded-2xl shadow-md p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             📊 Past Semester Performance
@@ -163,27 +163,35 @@ export default function SubjectDetails({ subject }) {
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
           📝 Assignments
         </h3>
-        <AssignmentList assignments={subject.assignments} />
+        <AssignmentList assignments={subject.assignments || []} />
       </div>
 
-      {/* Extra Insights Section - to stretch */}
+      {/* Extra Insights Section */}
       <div className="bg-gradient-to-br from-yellow-50 to-orange-100 rounded-2xl shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-3">
           🔍 Subject Insights
         </h3>
         <ul className="list-disc pl-6 text-gray-700 space-y-1 text-sm">
           <li>
-            Strengths: {subject.midSem > 70 ? "Good grasp on core concepts" : "Needs better preparation"}.
+            Strengths:{" "}
+            {subject.midSem > 70
+              ? "Good grasp on core concepts"
+              : "Needs better preparation"}
+            .
           </li>
           <li>
-            Weak Areas: {subject.attendanceData.some((a) => a.attendance < 75)
+            Weak Areas:{" "}
+            {subject.attendanceData?.some((a) => a.attendance < 75)
               ? "Low attendance may affect performance"
-              : "Attendance consistent"}.
+              : "Attendance consistent"}
+            .
           </li>
           <li>
-            Assignments: {subject.assignments.length > 0
+            Assignments:{" "}
+            {subject.assignments?.length > 0
               ? `${subject.assignments.length} pending`
-              : "All cleared"}.
+              : "All cleared"}
+            .
           </li>
         </ul>
       </div>
@@ -194,7 +202,8 @@ export default function SubjectDetails({ subject }) {
           📅 Upcoming Exams
         </h3>
         <p className="text-sm text-gray-600">
-          Mid-term exams scheduled for <b>15th October</b>. Prepare modules 1–3 thoroughly.
+          Mid-term exams scheduled for <b>15th October</b>. Prepare modules 1–3
+          thoroughly.
         </p>
       </div>
     </div>
